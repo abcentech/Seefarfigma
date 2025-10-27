@@ -10,8 +10,9 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -19,14 +20,30 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - name: Build project
-        run: npm run build
+      - name: Install Dependencies
+        run: |
+          echo "Installing project dependencies..."
+          npm install --prefer-offline --no-audit
+          echo "✅ Dependencies installed."
+
+      - name: Build Vite Project
+        run: |
+          echo "🚀 Building project..."
+          export NODE_OPTIONS=--max_old_space_size=4096
+          npm run build
+          echo "✅ Build completed."
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+
