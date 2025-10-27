@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react' // remove if not using React
 export default defineConfig({
   base: '/seefarfigma/',  // 👈 repo name
   plugins: [react()],
-}),
+});
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
